@@ -1,0 +1,668 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DecorebaMed | Caderno de Pediatria</title>
+
+<style>
+:root {
+  --bg: #f4f7f7;
+  --surface: #ffffff;
+  --surface2: #eaf2f1;
+  --text: #193a3b;
+  --muted: #718585;
+  --primary: #176b67;
+  --primary-light: #dcefeb;
+  --border: #dce7e5;
+  --shadow: 0 8px 30px rgba(20,65,62,.07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(135deg,#123f40,#176b67);
+  color: white;
+  padding: 34px 22px 42px;
+}
+
+.header-content {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.brand {
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: .8;
+  font-weight: 700;
+}
+
+h1 {
+  font-family: Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(30px,5vw,46px);
+  margin: 18px 0 8px;
+}
+
+.subtitle {
+  opacity: .85;
+  max-width: 650px;
+  font-size: 15px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+.stat {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+main {
+  max-width: 1100px;
+  margin: -18px auto 60px;
+  padding: 0 18px;
+}
+
+.toolbar {
+  background: var(--surface);
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+input, select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 14px;
+  font-size: 14px;
+  background: white;
+  color: var(--text);
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(23,107,103,.1);
+}
+
+.section-title {
+  font-family: Georgia, serif;
+  font-size: 25px;
+  font-weight: 500;
+  margin: 30px 0 14px;
+}
+
+.topic {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.topic summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+}
+
+.topic summary::-webkit-details-marker { display: none; }
+
+.topic summary:hover {
+  background: var(--surface2);
+}
+
+.topic-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topic-count {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pages {
+  padding: 0 16px 16px;
+}
+
+.page-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.page-card summary {
+  padding: 12px 14px;
+  background: #fafcfc;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.page-content {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #304d4c;
+  line-height: 1.75;
+}
+
+.page-ref {
+  display: inline-block;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-left: 8px;
+}
+
+.empty, .loading, .error {
+  text-align: center;
+  padding: 42px 20px;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.error { color: #a33b3b; }
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+footer {
+  text-align: center;
+  padding: 30px 15px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.hidden { display: none !important; }
+
+@media(max-width:650px) {
+  .toolbar { grid-template-columns: 1fr; }
+  header { padding: 28px 18px 36px; }
+  .topic summary { padding: 15px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="brand">DecorebaMed · Biblioteca médica</div>
+    <h1>Caderno de Pediatria</h1>
+    <div class="subtitle">
+      Seu material organizado por temas, com acesso ao conteúdo original
+      de cada página do PDF.
+    </div>
+
+    <div class="stats">
+      <div class="stat" id="pdfStat">Carregando documento...</div>
+      <div class="stat" id="pageStat">— páginas</div>
+      <div class="stat" id="topicStat">— temas</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <input
+      id="search"
+      type="search"
+      placeholder="Pesquisar assunto, termo ou conteúdo..."
+      aria-label="Pesquisar conteúdo"
+    >
+
+    <select id="documentSelect" aria-label="Selecionar documento">
+      <option value="">Selecionar documento</option>
+    </select>
+  </div>
+
+  <div id="status" class="loading">
+    <strong>Carregando sua biblioteca...</strong>
+    <p class="muted">Buscando os PDFs salvos no DecorebaMed.</p>
+  </div>
+
+  <div id="content" class="hidden">
+    <h2 class="section-title">Conteúdo organizado</h2>
+    <p class="muted">
+      A classificação temática é automática e editorial.
+      Confira sempre a página original do material.
+    </p>
+    <div id="topics"></div>
+  </div>
+</main>
+
+<footer>
+  DecorebaMed · Caderno complementar de Pediatria
+</footer>
+
+<script>
+const DB_NAME = "DecorebaMedPediatria";
+const STORE_NAME = "documents";
+
+let documents = [];
+let selectedDocument = null;
+let allPages = [];
+
+const categories = [
+  {
+    name: "Neonatologia",
+    icon: "👶",
+    keywords: [
+      "neonat", "apgar", "capurro", "recém-nascido",
+      "recem-nascido", "prematur", "sala de parto",
+      "teste do pezinho", "teste do coraçãozinho",
+      "icterícia neonatal", "ictericia neonatal",
+      "desconforto respiratório neonatal",
+      "síndrome do desconforto respiratório",
+      "sindrome do desconforto respiratorio",
+      "reanimação neonatal", "reanimacao neonatal"
+    ]
+  },
+  {
+    name: "Crescimento e desenvolvimento",
+    icon: "📈",
+    keywords: [
+      "crescimento", "desenvolvimento neuropsicomotor",
+      "marcos do desenvolvimento", "fontanela",
+      "perímetro cefálico", "perimetro cefalico",
+      "peso ao nascer", "estatura", "curva de crescimento",
+      "m-chat", "tanner"
+    ]
+  },
+  {
+    name: "Aleitamento e nutrição",
+    icon: "🍼",
+    keywords: [
+      "aleitamento", "amamentação", "amamentacao",
+      "leite materno", "alimentação complementar",
+      "alimentacao complementar", "vitamina d",
+      "ferro profilático", "ferro profilatico",
+      "suplementação de ferro", "suplementacao de ferro"
+    ]
+  },
+  {
+    name: "Imunizações",
+    icon: "💉",
+    keywords: [
+      "vacina", "imunização", "imunizacao",
+      "calendário vacinal", "calendario vacinal",
+      "pni", "contraindicação vacinal",
+      "contraindicacao vacinal"
+    ]
+  },
+  {
+    name: "Infectologia e doenças exantemáticas",
+    icon: "🦠",
+    keywords: [
+      "exantema", "sarampo", "rubéola", "rubeola",
+      "varicela", "escarlatina", "parvovírus",
+      "parvovirus", "kawasaki", "toxoplasmose",
+      "citomegalovírus", "citomegalovirus",
+      "sífilis congênita", "sifilis congenita",
+      "infecção congênita", "infeccao congenita",
+      "parasitos", "parasitoses", "helmintos"
+    ]
+  },
+  {
+    name: "Pneumologia e alergia",
+    icon: "🫁",
+    keywords: [
+      "asma", "gina", "bronquiolite", "sibilância",
+      "sibilancia", "pneumonia", "crise asmática",
+      "crise asmatica", "palivizumabe", "nirsevimabe",
+      "frequência respiratória", "frequencia respiratoria"
+    ]
+  },
+  {
+    name: "Gastroenterologia",
+    icon: "🍎",
+    keywords: [
+      "diarreia", "desidratação", "desidratacao",
+      "plano a", "plano b", "plano c",
+      "constipação", "constipacao",
+      "rome iv", "reidratação", "reidratacao"
+    ]
+  },
+  {
+    name: "Cardiologia",
+    icon: "❤️",
+    keywords: [
+      "cardiopatia", "cardiopatias congênitas",
+      "cardiopatias congenitas", "sopro cardíaco",
+      "sopro cardiaco", "febre reumática",
+      "febre reumatica", "critérios de jones",
+      "criterios de jones", "oximetria"
+    ]
+  },
+  {
+    name: "Nefrologia",
+    icon: "🩺",
+    keywords: [
+      "refluxo vesicoureteral", "nefrologia",
+      "infecção urinária", "infeccao urinaria",
+      "síndrome nefrótica", "sindrome nefrotica",
+      "síndrome nefrítica", "sindrome nefritica"
+    ]
+  },
+  {
+    name: "Neurologia e comportamento",
+    icon: "🧠",
+    keywords: [
+      "reflexos primitivos", "reflexo de moro",
+      "tdah", "autismo", "m-chat",
+      "neurocutânea", "neurocutanea",
+      "convulsão", "convulsao", "epilepsia"
+    ]
+  },
+  {
+    name: "Urgências e segurança infantil",
+    icon: "🚑",
+    keywords: [
+      "urgência", "urgencia", "emergência",
+      "emergencia", "transporte seguro",
+      "cadeirinha", "acidente", "reanimação",
+      "reanimacao", "suporte básico", "suporte basico"
+    ]
+  },
+  {
+    name: "Puberdade e adolescência",
+    icon: "🌱",
+    keywords: [
+      "puberdade", "adolescência", "adolescencia",
+      "tanner", "menarca", "telarca",
+      "pubarca"
+    ]
+  },
+  {
+    name: "Prevenção e cuidados gerais",
+    icon: "☀️",
+    keywords: [
+      "tempo de tela", "sono seguro", "sono",
+      "prevenção", "prevencao", "índice de massa corporal",
+      "indice de massa corporal", "imc",
+      "obesidade", "sobrepeso"
+    ]
+  }
+];
+
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+
+    request.onupgradeneeded = () => {
+      request.transaction.abort();
+      reject(new Error("Banco de dados do aplicativo não encontrado."));
+    };
+  });
+}
+
+function getDocuments(db) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.getAll();
+
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function normalize(text) {
+  return (text || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function classifyPage(page) {
+  const text = normalize(page.text);
+  const scores = categories.map(category => ({
+    category,
+    score: category.keywords.reduce((total, keyword) => {
+      return total + (text.includes(normalize(keyword)) ? 1 : 0);
+    }, 0)
+  }));
+
+  scores.sort((a,b) => b.score - a.score);
+
+  if (!scores.length || scores[0].score === 0) {
+    return "Outros conteúdos";
+  }
+
+  return scores[0].category.name;
+}
+
+function escapeHTML(value) {
+  return String(value || "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+function render() {
+  if (!selectedDocument) return;
+
+  const query = normalize(document.getElementById("search").value);
+
+  const pages = (selectedDocument.pages || []).map(page => ({
+    ...page,
+    category: classifyPage(page)
+  }));
+
+  allPages = pages;
+
+  const grouped = {};
+
+  pages.forEach(page => {
+    const content = normalize(page.text);
+    const title = `Página ${page.pageNo}`;
+
+    if (query && !content.includes(query) &&
+        !normalize(title).includes(query) &&
+        !normalize(page.category).includes(query)) {
+      return;
+    }
+
+    if (!grouped[page.category]) grouped[page.category] = [];
+    grouped[page.category].push(page);
+  });
+
+  const topics = document.getElementById("topics");
+  topics.innerHTML = "";
+
+  const categoryOrder = categories.map(c => c.name)
+    .concat(["Outros conteúdos"]);
+
+  let visiblePages = 0;
+  let visibleTopics = 0;
+
+  categoryOrder.forEach(categoryName => {
+    const group = grouped[categoryName];
+    if (!group || !group.length) return;
+
+    visiblePages += group.length;
+    visibleTopics++;
+
+    const category = categories.find(c => c.name === categoryName);
+    const icon = category ? category.icon : "📚";
+
+    const details = document.createElement("details");
+    details.className = "topic";
+    details.open = Boolean(query);
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `
+      <span class="topic-name">
+        <span>${icon}</span>
+        <span>${escapeHTML(categoryName)}</span>
+      </span>
+      <span class="topic-count">${group.length} página(s)　⌄</span>
+    `;
+
+    const pagesContainer = document.createElement("div");
+    pagesContainer.className = "pages";
+
+    group.forEach(page => {
+      const card = document.createElement("details");
+      card.className = "page-card";
+
+      const pageSummary = document.createElement("summary");
+      pageSummary.innerHTML = `
+        Página ${escapeHTML(page.pageNo)}
+        <span class="page-ref">PED.pdf · pág. ${escapeHTML(page.pageNo)}</span>
+      `;
+
+      const content = document.createElement("div");
+      content.className = "page-content";
+      content.textContent = page.text || "Não há texto extraído nesta página.";
+
+      card.appendChild(pageSummary);
+      card.appendChild(content);
+      pagesContainer.appendChild(card);
+    });
+
+    details.appendChild(summary);
+    details.appendChild(pagesContainer);
+    topics.appendChild(details);
+  });
+
+  document.getElementById("pageStat").textContent =
+    `${pages.length} páginas no documento`;
+
+  document.getElementById("topicStat").textContent =
+    `${visibleTopics} temas exibidos`;
+
+  if (visiblePages === 0) {
+    topics.innerHTML = `
+      <div class="empty">
+        <strong>Nenhum resultado encontrado.</strong>
+        <p class="muted">Tente outro termo de pesquisa.</p>
+      </div>`;
+  }
+}
+
+function selectDocument(id) {
+  selectedDocument = documents.find(doc => String(doc.id) === String(id));
+  if (!selectedDocument) return;
+
+  document.getElementById("pdfStat").textContent =
+    selectedDocument.name || "Documento";
+
+  document.getElementById("pageStat").textContent =
+    `${(selectedDocument.pages || []).length} páginas`;
+
+  document.getElementById("content").classList.remove("hidden");
+  document.getElementById("status").classList.add("hidden");
+
+  render();
+}
+
+async function init() {
+  const status = document.getElementById("status");
+
+  try {
+    if (!("indexedDB" in window)) {
+      throw new Error("Este navegador não oferece suporte ao IndexedDB.");
+    }
+
+    const db = await openDatabase();
+    documents = await getDocuments(db);
+
+    if (!documents.length) {
+      throw new Error(
+        "Nenhum PDF foi encontrado. Abra o DecorebaMed principal neste mesmo navegador e importe o PED.pdf."
+      );
+    }
+
+    const select = document.getElementById("documentSelect");
+
+    documents.forEach(doc => {
+      const option = document.createElement("option");
+      option.value = doc.id;
+      option.textContent = doc.name || "Documento sem nome";
+      select.appendChild(option);
+    });
+
+    const preferred = documents.find(doc =>
+      normalize(doc.name).includes("ped.pdf")
+    ) || documents[0];
+
+    select.value = preferred.id;
+    selectDocument(preferred.id);
+
+    select.addEventListener("change", () => {
+      selectDocument(select.value);
+    });
+
+    document.getElementById("search").addEventListener("input", render);
+
+    db.close();
+
+  } catch (error) {
+    status.className = "error";
+    status.innerHTML = `
+      <strong>Não foi possível carregar sua biblioteca.</strong>
+      <p>${escapeHTML(error.message)}</p>
+      <p class="muted">
+        Confira se você abriu esta página pelo mesmo endereço do
+        DecorebaMed principal e no mesmo navegador.
+      </p>
+      <p>
+        <a href="../index.html">Voltar ao DecorebaMed</a>
+      </p>
+    `;
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>
